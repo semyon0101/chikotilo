@@ -7,11 +7,11 @@ const AccessTerminal = ({ onComplete }) => {
   const [logs, setLogs] = useState([]);
   const fullLogs = [
     "> INITIATING SECURE CONNECTION...",
-    "> ACCESSING HISTORICAL_ARCHIVE_NODE_1",
-    "> DECRYPTING DOSSIER: CRIMINOLOGY_1800_2008",
-    "> BYPASSING SYSTEM FIREWALL...",
+    "> ACCESSING KGB_ARCHIVE_NODE_4",
+    "> DECRYPTING FILE: DELO_18-54",
+    "> BYPASSING FIREWALL...",
     "> AUTH_SUCCESS: ACCESS GRANTED",
-    "> LOADING MULTIMEDIA INTERFACE..."
+    "> LOADING INTERFACE..."
   ];
 
   useEffect(() => {
@@ -85,28 +85,27 @@ const TreeTimeline = () => {
             )}
             
             {content.timeline.map((item, index) => {
-              // Horizontal Logic (Desktop)
-              const xBaseH = 100 + (index * (1100 / (content.timeline.length - 1)));
+              // Desktop: Horizontal
+              const xBaseH = 100 + (index * (1150 / (content.timeline.length - 1)));
               const isUpH = index % 2 === 0;
               const yTrunkH = 250;
               const yEndH = isUpH ? 100 : 400;
-              const xBendH = xBaseH + 50;
+              const xBendH = xBaseH + 40;
 
-              // Vertical Logic (Mobile)
-              const yBaseV = 100 + (index * 180);
+              // Mobile: Vertical
+              const yBaseV = 100 + (index * 190);
               const isLeftV = index % 2 === 0;
               const xTrunkV = 400;
               const xEndV = isLeftV ? 50 : 750;
               const xBendV = isLeftV ? 250 : 550;
-              const yBendV = yBaseV + 40;
+              const yBendV = yBaseV + 30;
 
               const pathData = isMobile 
                 ? `M ${xTrunkV} ${yBaseV} L ${xBendV} ${yBendV} L ${isLeftV ? xEndV + 150 : xEndV - 150} ${yBendV}`
-                : `M ${xBaseH} ${yTrunkH} L ${xBendH} ${yEndH} L ${xBendH + 150} ${yEndH}`;
+                : `M ${xBaseH} ${yTrunkH} L ${xBendH} ${yEndH} L ${xBendH + 120} ${yEndH}`;
               
               const xText = isMobile ? (isLeftV ? xEndV : xEndV - 140) : xBendH;
               const yText = isMobile ? (yBendV - 10) : (isUpH ? yEndH - 15 : yEndH + 45);
-              const yTitle = isMobile ? (yBendV + 20) : (isUpH ? yEndH - 55 : yEndH + 70);
 
               return (
                 <g key={item.id} className="branch-group">
@@ -121,12 +120,11 @@ const TreeTimeline = () => {
                       window.scrollTo({ top: targetY, behavior: 'smooth' });
                     }
                   }}>
-                    <text x={xText} y={yText} className="node-year-text">{item.year}</text>
-                    {!isMobile && <text x={xText} y={yTitle} className="node-title-text" style={{ fontSize: '0.5rem' }}>{item.title}</text>}
+                    <text x={xText} y={yText} className="node-year-text" style={{ fontSize: isMobile ? '1.8rem' : '2.2rem' }}>{item.year}</text>
                     <rect 
                        x={isMobile ? (isLeftV ? xEndV : xEndV - 150) : xBendH} 
                        y={isMobile ? (yBendV - 40) : (isUpH ? yEndH - 80 : yEndH)} 
-                       width="200" height="120" fill="transparent" 
+                       width="150" height="100" fill="transparent" 
                     />
                   </g>
                 </g>
@@ -143,7 +141,7 @@ const EvidenceFolder = ({ item, index }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isStarted, setIsStarted] = useState(false);
   const containerRef = useRef(null);
-  const linkedAudio = index === 2 ? content.audio_archive[0] : (index === 5 ? content.audio_archive[1] : null);
+  const linkedAudio = item.year === "1985" ? content.audio_archive[0] : (item.year === "1990" ? content.audio_archive[1] : null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setIsStarted(true); }, { threshold: 0.2 });
@@ -165,7 +163,7 @@ const EvidenceFolder = ({ item, index }) => {
       <div ref={containerRef} className="evidence-folder">
         <div className="stamp">SECRET_ARCHIVE</div>
         <div className="folder-header">
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', opacity: 0.5 }}>CASE_DOCKET_{index + 1}</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', opacity: 0.5 }}>VOL_{index + 203}</span>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 900, color: 'var(--accent-color)' }}>{item.year}</div>
         </div>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', margin: '15px 0', lineHeight: 1.1 }}>{item.title}</h2>
@@ -175,7 +173,7 @@ const EvidenceFolder = ({ item, index }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ background: 'var(--accent-color)', padding: '10px', borderRadius: '50%' }}><Volume2 size={20} /></div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>ARCHIVE_RECORDING</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>RECORDING_{item.year}</div>
                 <audio controls src={linkedAudio.src} style={{ width: '100%', height: '35px', marginTop: '10px', filter: 'invert(1)' }} />
               </div>
             </div>
@@ -184,7 +182,7 @@ const EvidenceFolder = ({ item, index }) => {
         {item.media && item.media.type !== 'graphic' && (
           <div className="polaroid-frame">
             <img src={item.media.url} alt={item.media.caption} style={{ width: '100%', display: 'block' }} />
-            <div className="polaroid-note">МАТЕРИАЛ: {item.media.caption}</div>
+            <div className="polaroid-note">ПРИЛОЖЕНИЕ: {item.media.caption}</div>
           </div>
         )}
       </div>
@@ -218,10 +216,8 @@ function App() {
       <header style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <div className="reveal">
           <ShieldAlert size={80} color="#ff1a1a" style={{ marginBottom: '30px' }} />
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(3rem, 15vw, 10rem)', margin: 0, lineHeight: 0.8, fontWeight: 900, letterSpacing: '-5px' }}>
-            СЛЕДСТВИЕ
-          </h1>
-          <p style={{ fontFamily: 'var(--font-mono)', opacity: 0.4, marginTop: '30px' }}>ИСТОРИЯ КРИМИНАЛИСТИКИ В РОССИИ И СССР // 1800–2008</p>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(4rem, 20vw, 15rem)', margin: 0, lineHeight: 0.8, fontWeight: 900, letterSpacing: '-10px' }}>ЗВЕРЬ</h1>
+          <p style={{ fontFamily: 'var(--font-mono)', opacity: 0.4, marginTop: '30px' }}>АРХИВНОЕ ДЕЛО №18/54 // РОСТОВ-НА-ДОНУ</p>
         </div>
       </header>
 
@@ -253,7 +249,7 @@ function App() {
               {index < content.timeline.length - 1 && (
                 <>
                   <div className="evidence-connector"></div>
-                  <div className="forensic-tag"><span>CASE</span>{index + 1}</div>
+                  <div className="forensic-tag"><span>UNIT</span>{index + 1}</div>
                 </>
               )}
             </React.Fragment>
@@ -267,17 +263,15 @@ function App() {
               <div className="inventory-category">
                 <h4>БИБЛИОГРАФИЯ</h4>
                 <ul>
-                  <li>Трегубов С.Н. — «Основы уголовной техники» (1915)</li>
-                  <li>Кошко А.Ф. — «Очерки уголовного мира царской России»</li>
-                  <li>Исаева Л. — «Серийные убийства: история и современность»</li>
+                  <li><a href="https://rodina-history.ru/2025/11/20/35-let-nazad-byl-zaderzhan-maniak-chikatilo-imia-ego-stalo-sinonimom-absoliutnogo-zla.html?utm_referrer=https%3A%2F%2Fwww.google.com%2F" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Как искали Чикатило (Родина)</a></li>
+                  <li><a href="https://matzpen.ru/articles/zabolevaniya-i-rasstroystva/chikatilo-psikhopat-lishennyy-sovesti/" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Психопатология: Портрет (Матцпен)</a></li>
+                  <li><a href="https://petrovka-38.com/arkhiv/item/strashnyj-spisok-chikatilo" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Страшный список (Петровка-38)</a></li>
                 </ul>
               </div>
               <div className="inventory-category">
                 <h4>АРХИВНЫЕ ИСТОЧНИКИ</h4>
                 <ul>
-                  <li>Фонды Государственного Архива РФ (ГАРФ)</li>
-                  <li>Электронная библиотека периодики РНБ</li>
-                  <li>Материалы уголовных дел ОГПУ и МВД СССР</li>
+                  <li><a href="https://www.gazeta.ru/science/2019/02/14_a_12182677.shtml" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>25 лет казни (Газета.ру)</a></li>
                 </ul>
               </div>
             </div>
@@ -290,7 +284,7 @@ function App() {
       </main>
 
       <footer style={{ padding: '60px 0', textAlign: 'center', opacity: 0.3, fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
-        <p>© 2026 ИСТОРИЧЕСКИЙ ПРОЕКТ • МЕТОДЫ СЫСКА</p>
+        <p>© 2026 ИСТОРИЧЕСКИЙ ПРОЕКТ • ЭФФЕКТ ПРИСУТСТВИЯ</p>
       </footer>
     </div>
   );
