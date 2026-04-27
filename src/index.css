@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite&family=Montserrat:wght@300;700;900&display=swap');
+
+:root {
+  --bg-color: #030303;
+  --text-color: #e0e0e0;
+  --accent-color: #c41c1c;
+  --paper-color: #f2efe6;
+  --folder-color: #c5bba3;
+  --nav-height: 70px;
+  --font-serif: 'EB Garamond', serif;
+  --font-display: 'Playfair Display', serif;
+  --font-typewriter: 'Special Elite', system-ui;
+  --font-mono: 'Courier Prime', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+  cursor: none !important;
+}
+
+body {
+  margin: 0; padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  overflow-x: hidden; /* Prevent global horizontal scroll */
+  width: 100%;
+}
+
+/* --- ACCESS SCREEN --- */
+.access-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: #000; z-index: 50000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--font-mono); color: #0f0;
+}
+
+.terminal-cursor {
+  display: inline-block; width: 10px; height: 20px; background: #0f0;
+  animation: blink 0.8s infinite; vertical-align: middle; margin-left: 5px;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* --- CRT EFFECTS --- */
+.crt-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
+  z-index: 40000; background-size: 100% 3px, 2px 100%; pointer-events: none;
+}
+
+/* --- FLASHLIGHT --- */
+.flashlight {
+  position: fixed; width: 500px; height: 500px;
+  background: radial-gradient(circle at center, rgba(255, 255, 240, 0.2) 0%, rgba(255, 255, 240, 0.08) 35%, transparent 70%);
+  border-radius: 50%; pointer-events: none; z-index: 45000;
+  transform: translate(-50%, -50%); mix-blend-mode: screen;
+}
+.flashlight::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+  opacity: 0.4; border-radius: 50%;
+}
+.flashlight-dot {
+  position: fixed; width: 8px; height: 8px; background: #000;
+  border: 1px solid rgba(255,255,255,0.7); border-radius: 50%;
+  pointer-events: none; z-index: 45001; transform: translate(-50%, -50%);
+}
+
+/* --- TIMELINE (DESKTOP) --- */
+.branching-timeline-section { 
+  padding: 100px 0; background: #000; width: 100%; overflow: hidden;
+}
+.tree-viewport { 
+  width: 100%; max-width: 1200px; height: 500px; position: relative; margin: 0 auto; 
+}
+.tree-branch-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.tree-trunk-desktop { 
+  position: absolute; top: 50%; left: 0; right: 0; height: 1px; 
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent); 
+  opacity: 0.5; z-index: 1;
+}
+.branch-path { fill: none; stroke: var(--accent-color); stroke-width: 1.5; opacity: 0.4; transition: all 0.3s ease; }
+.branch-group:hover .branch-path { opacity: 1; stroke-width: 3; }
+.node-year-text { font-family: var(--font-display); font-size: 2.2rem; font-weight: 900; fill: var(--accent-color); cursor: pointer; }
+.node-title-text { font-family: var(--font-mono); font-size: 0.65rem; fill: #888; text-transform: uppercase; cursor: pointer; }
+
+/* --- FOLDER SYSTEM --- */
+.folder-wrapper { position: relative; max-width: 850px; margin: 250px auto; z-index: 10; width: 90%; }
+.folder-base {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--folder-color); border-radius: 4px;
+  box-shadow: 20px 20px 60px rgba(0,0,0,0.8);
+  transform: rotate(-1.5deg); z-index: -2;
+}
+.folder-tab {
+  position: absolute; top: -35px; left: 40px; width: 160px; height: 45px;
+  background: var(--folder-color); border-radius: 8px 8px 0 0;
+  z-index: -3; transform: rotate(-1.5deg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 0.7rem; color: rgba(0,0,0,0.4);
+  font-weight: bold; padding-bottom: 5px;
+}
+.evidence-folder {
+  position: relative; background: var(--paper-color); color: #111;
+  padding: 80px 60px; box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
+  transform: rotate(1deg); transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+  z-index: 5;
+}
+.evidence-folder::before {
+  content: ''; position: absolute; top: 8px; left: 8px; width: 100%; height: 100%;
+  background: var(--paper-color); z-index: -1; transform: rotate(-1.5deg);
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+}
+.folder-wrapper:hover .evidence-folder { transform: rotate(0deg) translateY(-20px); }
+
+/* --- FINAL REPORT --- */
+.close-case-section { padding: 200px 0; background: #000; border-top: 5px solid #111; }
+.final-report-folder {
+  max-width: 900px; margin: 0 auto; background: #151515; border: 1px solid #333;
+  padding: 80px; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+}
+.close-case-title { font-family: var(--font-display); font-size: 5rem; color: #fff; text-transform: uppercase; letter-spacing: -3px; margin-bottom: 60px; text-align: center; }
+.close-case-title span { color: var(--accent-color); }
+.inventory-list { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; text-align: left; }
+.inventory-category h4 { font-family: var(--font-typewriter); color: var(--accent-color); font-size: 1.3rem; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+.inventory-category ul { list-style: none; padding: 0; }
+.inventory-category li { font-family: var(--font-mono); font-size: 0.95rem; margin-bottom: 18px; color: #aaa; display: flex; gap: 12px; line-height: 1.5; }
+.inventory-category li::before { content: '>'; color: var(--accent-color); }
+
+.final-lock-container { text-align: center; margin-top: 100px; opacity: 0.2; }
+.final-status-text { 
+  font-family: var(--font-mono); margin-top: 20px; 
+  letter-spacing: 15px; font-size: 0.7rem; color: #fff; 
+}
+
+/* --- NAVIGATION --- */
+.sticky-nav {
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 30000;
+  background: rgba(2, 2, 2, 0.95); border-bottom: 1px solid #333;
+  height: var(--nav-height); display: flex; align-items: center;
+  backdrop-filter: blur(10px);
+}
+.nav-container { width: 100%; max-width: 1000px; margin: 0 auto; display: flex; justify-content: center; gap: 20px; }
+.nav-link { color: #555; text-decoration: none; font-family: var(--font-mono); font-size: 0.8rem; padding: 10px 15px; transition: 0.3s; }
+.nav-link.active { color: var(--accent-color); border-bottom: 2px solid var(--accent-color); font-weight: bold; }
+
+/* --- UTILS --- */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.reveal { opacity: 0; transform: translateY(40px); transition: 1s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+.evidence-connector { height: 150px; width: 1px; background: var(--accent-color); margin: 0 auto; opacity: 0.15; }
+.forensic-tag { width: 40px; height: 50px; background: #f1c40f; color: #000; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 900; margin: 20px auto; transform: rotate(-10deg); font-size: 0.8rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+.stamp { position: absolute; top: 30px; right: 30px; padding: 8px 15px; border: 3px double var(--accent-color); color: var(--accent-color); font-family: var(--font-typewriter); transform: rotate(15deg); font-weight: bold; opacity: 0.8; font-size: 0.9rem; }
+.polaroid-frame { background: #fff; padding: 10px 10px 45px 10px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); transform: rotate(1.5deg); margin-top: 50px; border: 1px solid #eee; position: relative; }
+
+/* --- MOBILE REFINEMENT (STRICT) --- */
+@media (max-width: 768px) {
+  html, body { cursor: auto !important; overflow-x: hidden !important; width: 100vw !important; }
+  .flashlight, .flashlight-dot { display: none !important; }
+  
+  /* Timeline fix - Robust Vertical */
+  .branching-timeline-section { overflow: hidden !important; padding: 60px 0 !important; }
+  .tree-viewport { height: 1100px !important; min-width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+  
+  /* Folder stability */
+  .folder-wrapper { margin: 80px auto !important; width: 95% !important; max-width: 95% !important; padding: 0 !important; }
+  .evidence-folder { padding: 30px 15px !important; transform: none !important; width: auto !important; }
+  .folder-base { transform: none !important; }
+  .folder-tab { width: 90px !important; left: 10px !important; font-size: 0.55rem !important; top: -25px !important; transform: none !important; }
+  .stamp { top: 10px !important; right: 10px !important; font-size: 0.6rem !important; padding: 3px 6px !important; transform: none !important; }
+  
+  /* Text and headers */
+  .close-case-title { font-size: 2.2rem !important; letter-spacing: -1px !important; }
+  .final-status-text { letter-spacing: 4px !important; font-size: 0.5rem !important; margin-top: 10px !important; display: block; text-align: center; }
+  .final-report-folder { padding: 40px 15px !important; width: 90% !important; }
+  .inventory-list { grid-template-columns: 1fr !important; gap: 25px !important; }
+  
+  /* Nav stability */
+  .nav-container { gap: 10px !important; overflow-x: auto; justify-content: flex-start; padding: 0 15px; -webkit-overflow-scrolling: touch; }
+  .nav-link { font-size: 0.7rem !important; padding: 5px 8px !important; white-space: nowrap; }
+}
