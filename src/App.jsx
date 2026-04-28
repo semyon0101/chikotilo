@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import content from './data/content.json';
-import { Play, Pause, Folder, Lock, Volume2, ShieldAlert, Terminal, FileText, ArrowDown } from 'lucide-react';
+import { Play, Pause, Folder, Lock, Volume2, ShieldAlert, Terminal, FileText, ArrowDown, Video } from 'lucide-react';
+
+const getVkEmbedUrl = (url) => {
+  if (!url) return null;
+  const match = url.match(/video(-?\d+)_(\d+)/);
+  if (match) {
+    return `https://vk.com/video_ext.php?oid=${match[1]}&id=${match[2]}`;
+  }
+  return url;
+};
 
 // 1. TERMINAL INTRO
 const AccessTerminal = ({ onComplete }) => {
@@ -83,7 +92,7 @@ const TreeTimeline = () => {
             {isMobile && (
               <line x1="400" y1="0" x2="400" y2="1500" stroke="var(--accent-color)" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
             )}
-            
+
             {content.timeline.map((item, index) => {
               // Desktop: Horizontal
               const xBaseH = 100 + (index * (1150 / (content.timeline.length - 1)));
@@ -100,10 +109,10 @@ const TreeTimeline = () => {
               const xBendV = isLeftV ? 250 : 550;
               const yBendV = yBaseV + 30;
 
-              const pathData = isMobile 
+              const pathData = isMobile
                 ? `M ${xTrunkV} ${yBaseV} L ${xBendV} ${yBendV} L ${isLeftV ? xEndV + 150 : xEndV - 150} ${yBendV}`
                 : `M ${xBaseH} ${yTrunkH} L ${xBendH} ${yEndH} L ${xBendH + 120} ${yEndH}`;
-              
+
               const xText = isMobile ? (isLeftV ? xEndV : xEndV - 140) : xBendH;
               const yText = isMobile ? (yBendV - 10) : (isUpH ? yEndH - 15 : yEndH + 45);
 
@@ -121,10 +130,10 @@ const TreeTimeline = () => {
                     }
                   }}>
                     <text x={xText} y={yText} className="node-year-text" style={{ fontSize: isMobile ? '1.8rem' : '2.2rem' }}>{item.year}</text>
-                    <rect 
-                       x={isMobile ? (isLeftV ? xEndV : xEndV - 150) : xBendH} 
-                       y={isMobile ? (yBendV - 40) : (isUpH ? yEndH - 80 : yEndH)} 
-                       width="150" height="100" fill="transparent" 
+                    <rect
+                      x={isMobile ? (isLeftV ? xEndV : xEndV - 150) : xBendH}
+                      y={isMobile ? (yBendV - 40) : (isUpH ? yEndH - 80 : yEndH)}
+                      width="150" height="100" fill="transparent"
                     />
                   </g>
                 </g>
@@ -141,7 +150,7 @@ const EvidenceFolder = ({ item, index }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isStarted, setIsStarted] = useState(false);
   const containerRef = useRef(null);
-  const linkedAudio = item.year === "1985" ? content.audio_archive[0] : (item.year === "1990" ? content.audio_archive[1] : null);
+  //const linkedAudio = item.year === "1985" ? content.audio_archive[0] : (item.year === "1990" ? content.audio_archive[1] : null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setIsStarted(true); }, { threshold: 0.2 });
@@ -168,21 +177,55 @@ const EvidenceFolder = ({ item, index }) => {
         </div>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', margin: '15px 0', lineHeight: 1.1 }}>{item.title}</h2>
         <p className="typewriter-text">{displayedText}</p>
-        {linkedAudio && (
+        {item.media && item.media.type === "audio" && (
           <div className="wiretap-box">
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ background: 'var(--accent-color)', padding: '10px', borderRadius: '50%' }}><Volume2 size={20} /></div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>RECORDING_{item.year}</div>
-                <audio controls src={linkedAudio.src} style={{ width: '100%', height: '35px', marginTop: '10px', filter: 'invert(1)' }} />
+                <audio controls src={item.media.src} style={{ width: '100%', height: '35px', marginTop: '10px', filter: 'invert(1)' }} />
               </div>
             </div>
           </div>
         )}
-        {item.media && item.media.type !== 'graphic' && (
+        {item.media && (item.media.type === 'photo' || item.media.type === 'text') && item.media.url && (
           <div className="polaroid-frame">
             <img src={item.media.url} alt={item.media.caption} style={{ width: '100%', display: 'block' }} />
             <div className="polaroid-note">ПРИЛОЖЕНИЕ: {item.media.caption}</div>
+          </div>
+        )}
+        {item.media && (item.media.type === "video" || item.media.type === "vk") && (
+          <div className="wiretap-box" style={{ marginTop: '40px', background: 'rgba(0,0,0,0.05)', padding: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ background: 'var(--accent-color)', padding: '10px', borderRadius: '50%', color: '#fff' }}><Video size={20} /></div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 'bold' }}>VIDEO_RECORDING_{item.year}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', opacity: 0.5 }}>SOURCE: {item.media.url?.includes('vk') ? 'EXTERNAL_VK_NODE' : 'LOCAL_ARCHIVE_FILE'}</div>
+              </div>
+            </div>
+            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', background: '#000', borderRadius: '2px', border: '1px solid rgba(0,0,0,0.1)' }}>
+              {item.media.url?.includes('vk') ? (
+                <iframe 
+                  src={getVkEmbedUrl(item.media.url)} 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" 
+                  frameBorder="0" 
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <video 
+                  src={item.media.url} 
+                  controls 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+                  poster={item.media.poster}
+                />
+              )}
+            </div>
+            {item.media.caption && (
+              <div style={{ marginTop: '10px', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', opacity: 0.5, textAlign: 'center', textTransform: 'uppercase' }}>
+                Приложение: {item.media.caption}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -212,7 +255,7 @@ function App() {
     <div className="app">
       <div className="crt-overlay"></div>
       <Flashlight />
-      
+
       <header style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <div className="reveal">
           <ShieldAlert size={80} color="#ff1a1a" style={{ marginBottom: '30px' }} />
@@ -225,16 +268,16 @@ function App() {
         <div className="nav-container">
           {content.timeline.map(item => (
             <a key={item.id} href={`#${item.id}`} className={`nav-link ${activeId === item.id ? 'active' : ''}`}
-               onClick={(e) => { 
-                 e.preventDefault(); 
-                 const el = document.getElementById(item.id); 
-                 if (el) {
-                   const rect = el.getBoundingClientRect();
-                   const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                   const targetY = rect.top + scrollTop - 70;
-                   window.scrollTo({ top: targetY, behavior: 'smooth' });
-                 }
-               }}>{item.year}</a>
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById(item.id);
+                if (el) {
+                  const rect = el.getBoundingClientRect();
+                  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                  const targetY = rect.top + scrollTop - 70;
+                  window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+              }}>{item.year}</a>
           ))}
         </div>
       </nav>
@@ -263,21 +306,21 @@ function App() {
               <div className="inventory-category">
                 <h4>БИБЛИОГРАФИЯ</h4>
                 <ul>
-                  <li><a href="https://rodina-history.ru/2025/11/20/35-let-nazad-byl-zaderzhan-maniak-chikatilo-imia-ego-stalo-sinonimom-absoliutnogo-zla.html?utm_referrer=https%3A%2F%2Fwww.google.com%2F" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Как искали Чикатило (Родина)</a></li>
-                  <li><a href="https://matzpen.ru/articles/zabolevaniya-i-rasstroystva/chikatilo-psikhopat-lishennyy-sovesti/" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Психопатология: Портрет (Матцпен)</a></li>
-                  <li><a href="https://petrovka-38.com/arkhiv/item/strashnyj-spisok-chikatilo" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>Страшный список (Петровка-38)</a></li>
+                  <li><a href="https://rodina-history.ru/2025/11/20/35-let-nazad-byl-zaderzhan-maniak-chikatilo-imia-ego-stalo-sinonimom-absoliutnogo-zla.html?utm_referrer=https%3A%2F%2Fwww.google.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Как искали Чикатило (Родина)</a></li>
+                  <li><a href="https://matzpen.ru/articles/zabolevaniya-i-rasstroystva/chikatilo-psikhopat-lishennyy-sovesti/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Психопатология: Портрет (Матцпен)</a></li>
+                  <li><a href="https://petrovka-38.com/arkhiv/item/strashnyj-spisok-chikatilo" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Страшный список (Петровка-38)</a></li>
                 </ul>
               </div>
               <div className="inventory-category">
                 <h4>АРХИВНЫЕ ИСТОЧНИКИ</h4>
                 <ul>
-                  <li><a href="https://www.gazeta.ru/science/2019/02/14_a_12182677.shtml" target="_blank" rel="noopener noreferrer" style={{color: 'inherit', textDecoration: 'none'}}>25 лет казни (Газета.ру)</a></li>
+                  <li><a href="https://www.gazeta.ru/science/2019/02/14_a_12182677.shtml" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>25 лет казни (Газета.ру)</a></li>
                 </ul>
               </div>
             </div>
             <div className="final-lock-container">
-               <Lock size={80} color="#fff" />
-               <p className="final-status-text">ARCHIVE_CLOSED_LOCKED</p>
+              <Lock size={80} color="#fff" />
+              <p className="final-status-text">ARCHIVE_CLOSED_LOCKED</p>
             </div>
           </div>
         </section>
